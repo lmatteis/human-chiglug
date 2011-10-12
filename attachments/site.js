@@ -1,3 +1,34 @@
+(function( window, document, $, undefined) {
+
+  var tooltip
+
+  // Append to list
+  $( '#crew h3 img' )
+    .live( 'mouseenter', function(){
+      var $img = $( this )
+        , pos  = $img.offset()
+
+      tooltip = tooltip || $( '<img />', { 'class': 'ttImg' } ).appendTo( document.body )
+
+      tooltip
+        .hide()
+        .load(function(){
+          tooltip.css(
+            { top : pos.top - ( tooltip.height() / 2 )
+            , left: pos.left + 30
+            })
+          .fadeIn()
+        })
+        .attr( 'src', this.src )
+
+      if ( $img[0].src == this.src )
+        tooltip.trigger( 'load' )
+    })
+    .live( 'mouseleave', function(){
+      tooltip.stop( true, true ).fadeOut()
+    })
+
+})( this, this.document, jQuery )
 var request = function (options, callback) {
   options.success = function (obj) {
     callback(null, obj);
@@ -53,10 +84,45 @@ function latestLinks(callback) {
 	});
 }
 
+function users(callback) {
+	$.getJSON("/api/_design/app/_view/users", function(data){
+		$.each(data.rows, function() {
+			callback.call(this);
+		});
+	});
+}
+function capitaliseFirstLetter(string)
+{
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 var app = {};
 app.index = function () {
-	latestLinks(function(){
-		$("links").append('<p><a href="'+this.value.link+'">'+this.value.link+'</a> by '+this.value.user+'</p>');	
+	users(function() {
+		var $user = $("#user").clone();
+		$user.attr("id","");
+		$user.get(0).id = "";
+		$user.show();
+
+		$user.find("h3 span.user").text(this.id);
+
+		for(var i in this.value) {
+			var value = this.value[i];
+			if(!value || value ==="false") continue;
+			if(i == "_id" || i == "_rev" || i == "type") continue;
+			if(i == "avatar") {
+				$user.find("h3 a").append("<img src='"+value+"' />");
+			} else if(i == "location"){
+				value = value + ' <a href="http://maps.google.com/maps?&amp;q='+value+'" title="Show it on a big map"><img src="http://maps.google.com/maps/api/staticmap?center='+value+'&amp;zoom=14&amp;size=175x175&amp;maptype=roadmap&amp;sensor=false" width="175" height="175"></a>';
+				$user.find("ul").append('<li class="location">'+capitaliseFirstLetter(i)+': '+value+'</li>');
+			} else {
+				if(i == "twitter")
+					value = "<a href='http://twitter.com/"+value+"'>"+value+"</a>";
+				$user.find("ul").append('<li>'+capitaliseFirstLetter(i)+': '+value+'</li>');
+			}
+
+		}
+
+		$("#crew").append($user);
 	});
 };
 
