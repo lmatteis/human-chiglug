@@ -128,7 +128,24 @@ app.index = function () {
 
 		$("#crew").append($user);
 	});
+
+    /*
+    latestLinks(function() {
+        var that = this;
+        $.getJSON("http://clients1.google.com/webpagethumbnail?r=4&f=3&s=400:585&query="+that.value.link+"&hl=en&gl=us&c=29&d="+encodeURIComponent(that.value.link)+"%2F&b=1&j=?&a=8EH", function(data) {
+            var thumb = data.shards[0].imgs[0];
+            //$("links").append("<a href='"+this.value.link+"'>"+this.value.link+"</a> by "+this.value.user+"<br>");
+            $("links").append("<p><a href='"+that.value.link+"'><img src='"+thumb+"' /></a><br>by "+that.value.user+"</p>");
+        });
+
+
+    });
+    */
 };
+
+$.ajaxSetup({
+    "cache":true
+});
 
 $(function () { 
   app.s = $.sammy(function () {
