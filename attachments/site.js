@@ -107,8 +107,10 @@ app.index = function () {
 
 		for(var i in this.value) {
 			var value = this.value[i];
+            i = i.toLowerCase();
+            if(i == "active" && value === "false") return; // returning here, we want users to turn off their card
+			if(i == "_id" || i == "_rev" || i == "type" || i == "active") continue;
 			if(!value || value ==="false") continue;
-			if(i == "_id" || i == "_rev" || i == "type") continue;
 			if(i == "avatar") {
 				$user.find("h3 a").append("<img src='"+value+"' />");
 			} else if(i == "location"){
@@ -117,6 +119,8 @@ app.index = function () {
 			} else {
 				if(i == "twitter")
 					value = "<a href='http://twitter.com/"+value+"'>"+value+"</a>";
+                else if (i == "github")
+					value = "<a href='https://github.com/"+value+"'>"+value+"</a>";
 				$user.find("ul").append('<li>'+capitaliseFirstLetter(i)+': '+value+'</li>');
 			}
 
