@@ -95,6 +95,13 @@ function capitaliseFirstLetter(string)
 {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+function escapeHtml(t) {
+	return $('<div/>').text(t).html();
+}
+function replaceURLWithHTMLLinks(text) {
+		var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+		return text.replace(exp,"<a target='_blank' href='$1'>$1</a>"); 
+}
 var app = {};
 app.index = function () {
 	users(function() {
@@ -107,6 +114,8 @@ app.index = function () {
 
 		for(var i in this.value) {
 			var value = this.value[i];
+			value = escapeHtml(value);
+			i = escapeHtml(i);
             i = i.toLowerCase();
             if(i == "active" && value === "false") return; // returning here, we want users to turn off their card
 			if(i == "_id" || i == "_rev" || i == "type" || i == "active") continue;
@@ -117,6 +126,7 @@ app.index = function () {
 				value = value + ' <a href="http://maps.google.com/maps?&amp;q='+value+'" title="Show it on a big map"><img src="http://maps.google.com/maps/api/staticmap?center='+value+'&amp;zoom=14&amp;size=175x175&amp;maptype=roadmap&amp;sensor=false" width="175" height="175"></a>';
 				$user.find("ul").append('<li class="location">'+capitaliseFirstLetter(i)+': '+value+'</li>');
 			} else {
+				value = replaceURLWithHTMLLinks(value);
 				if(i == "twitter")
 					value = "<a href='http://twitter.com/"+value+"'>"+value+"</a>";
                 else if (i == "github")
