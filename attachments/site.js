@@ -112,7 +112,14 @@ app.index = function () {
 
 		$user.find("h3 span.user").text(this.id);
 
-		for(var i in this.value) {
+		var props = [];
+		for(var i in this.value)	
+			props.push(i);
+
+		props = props.sort();
+
+		for(var x=0; x<props.length; x++) {
+			var i = props[x];
 			var value = this.value[i];
 			value = escapeHtml(value);
 			i = escapeHtml(i);
