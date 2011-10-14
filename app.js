@@ -18,9 +18,8 @@ ddoc.views = {};
 ddoc.views.linksByUser = {
     map: function (doc) {
         if(doc.type == "link")
-            emit(doc.user, 1);
-    },
-    reduce:"_sum"
+            emit(doc.user, doc.link);
+    }
 };
 ddoc.views.latestLinks = {
     map: function (doc) {

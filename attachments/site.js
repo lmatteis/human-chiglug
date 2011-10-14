@@ -91,6 +91,13 @@ function users(callback) {
 		});
 	});
 }
+function linksByUser(user, callback) {
+	$.getJSON("/api/_design/app/_view/linksByUser?key=\""+user+"\"", function(data){
+		$.each(data.rows, function(idx) {
+			callback.apply(this, [data.rows.length]);
+		});
+	});
+}
 function capitaliseFirstLetter(string)
 {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -102,7 +109,6 @@ function replaceURLWithHTMLLinks(text) {
 		var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 		return text.replace(exp,"<a target='_blank' href='$1'>$1</a>"); 
 }
-
 function replaceContent(template) {
     var c = $(".content").html($(template).html());
     return c;
@@ -112,8 +118,6 @@ app.index = function () {
     var content = replaceContent(".crew_template");
 	users(function() {
 		var $user = content.find(".crew_user:first-child").clone();
-		$user.attr("id","");
-		$user.get(0).id = "";
 		$user.show();
 
 		$user.find("h3 a.user")
@@ -172,11 +176,65 @@ app.user = function(context) {
     var content = replaceContent(".user_template");
     var user = this.params['user'];
     content.find("h1").text(user);
-};
 
-$.ajaxSetup({
-    "cache":true
-});
+    var loading = $(".loading");
+    loading.show();
+    var opts = {
+      lines: 12, // The number of lines to draw
+      length: 7, // The length of each line
+      width: 4, // The line thickness
+      radius: 10, // The radius of the inner circle
+      color: '#7A7A7A', // #rgb or #rrggbb
+      speed: 1, // Rounds per second
+      trail: 60, // Afterglow percentage
+      shadow: false // Whether to render a shadow
+    };
+    var target = loading.get(0);
+    var spinner = new Spinner(opts).spin(target);
+
+    function itsDone() {
+        var imgContent = content.find(".user_links");
+        // delete the first li
+        var firstCard = content.find(".link_card:first-child");
+        firstCard.remove();
+
+        imgContent.masonry({
+            itemSelector : '.link_card'
+        });
+        if(imgContent.children().length == 1) {
+            imgContent.css("height", "auto");
+            content.find(".user_links .last").before('<p class="no_images"><g>You haven\'t posted any images, <r>ASSHOLE</r><g></p>');
+        }
+        loading.hide();
+        imgContent.css("visibility", "visible");
+    }
+
+    var itemsLoaded = 0;
+    linksByUser(user, function(totItems){
+        var link = this.value;
+        var $card = content.find(".link_card:first-child").clone();
+        $card.show();
+
+        // load the img to see if it's an image
+        var img = new Image();
+        $(img)
+            .load(function(){
+                var a = $("<a href='"+link+"'></a>");
+                a.append(this);
+                $card.append(a);
+                content.find(".user_links .last").before($card);
+                itemsLoaded++;
+                if(itemsLoaded == totItems)
+                    itsDone();
+            })
+            .error(function(){
+                itemsLoaded++;
+                if(itemsLoaded == totItems)
+                    itsDone();
+            })
+            .attr("src", link);
+    });
+};
 
 $(function () { 
   app.s = $.sammy(function () {

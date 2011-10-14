@@ -14,6 +14,8 @@
 
     <link href="layout.css" rel="stylesheet" type="text/css" />
     <script language="javascript" type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script language="javascript" type="text/javascript" src="http://fgnass.github.com/spin.js/spin.min.js"></script>
+    <script language="javascript" type="text/javascript" src="jquery.masonry.min.js"></script>
     <script language="javascript" type="text/javascript" src="sammy/sammy.js"></script>
     <script language="javascript" type="text/javascript" src="site.js"></script>
   </head>
@@ -44,6 +46,12 @@
     </div>
     <div class="user_template" style="display: none">
         <h1>User</h1>
+        <p class="loading"></p>
+        <ul class="user_links" style="visibility: hidden;">
+            <li class="link_card" style="display: none">
+            </li>
+            <div class="last" style="clear:both;"></div>
+        </ul>
     </div>
 
     <!--
