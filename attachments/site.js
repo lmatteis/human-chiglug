@@ -3,7 +3,7 @@
   var tooltip
 
   // Append to list
-  $( '#crew h3 img' )
+  $( '.content .crew_card h3 img' )
     .live( 'mouseenter', function(){
       var $img = $( this )
         , pos  = $img.offset()
@@ -102,15 +102,23 @@ function replaceURLWithHTMLLinks(text) {
 		var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 		return text.replace(exp,"<a target='_blank' href='$1'>$1</a>"); 
 }
+
+function replaceContent(template) {
+    var c = $(".content").html($(template).html());
+    return c;
+}
 var app = {};
 app.index = function () {
+    var content = replaceContent(".crew_template");
 	users(function() {
-		var $user = $("#user").clone();
+		var $user = content.find(".crew_user:first-child").clone();
 		$user.attr("id","");
 		$user.get(0).id = "";
 		$user.show();
 
-		$user.find("h3 span.user").text(this.id);
+		$user.find("h3 a.user")
+                .attr("href", "#/"+this.id)
+                .text(this.id);
 
 		var props = [];
 		for(var i in this.value)	
@@ -128,7 +136,9 @@ app.index = function () {
 			if(i == "_id" || i == "_rev" || i == "type" || i == "active") continue;
 			if(!value || value ==="false") continue;
 			if(i == "avatar") {
-				$user.find("h3 a").append("<img src='"+value+"' />");
+				$user.find("h3 a:first-child")
+                    .attr("href", "#/"+this.id)
+                    .append("<img src='"+value+"' />");
 			} else if(i == "location"){
 				value = value + ' <a href="http://maps.google.com/maps?&amp;q='+value+'" title="Show it on a big map"><img src="http://maps.google.com/maps/api/staticmap?center='+value+'&amp;zoom=14&amp;size=175x175&amp;maptype=roadmap&amp;sensor=false" width="175" height="175"></a>';
 				$user.find("ul").append('<li class="location">'+capitaliseFirstLetter(i)+': '+value+'</li>');
@@ -143,7 +153,7 @@ app.index = function () {
 
 		}
 
-		$("#crew").append($user);
+		content.find(".crew_card").append($user);
 	});
 
     /*
@@ -154,10 +164,14 @@ app.index = function () {
             //$("links").append("<a href='"+this.value.link+"'>"+this.value.link+"</a> by "+this.value.user+"<br>");
             $("links").append("<p><a href='"+that.value.link+"'><img src='"+thumb+"' /></a><br>by "+that.value.user+"</p>");
         });
-
-
     });
     */
+};
+
+app.user = function(context) {
+    var content = replaceContent(".user_template");
+    var user = this.params['user'];
+    content.find("h1").text(user);
 };
 
 $.ajaxSetup({
@@ -169,6 +183,7 @@ $(function () {
     // Index of all databases
     this.get('', app.index);
     this.get("#/", app.index);
+    this.get("#/:user", app.user);
   })
   app.s.run();
 });

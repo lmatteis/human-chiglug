@@ -28,18 +28,29 @@
         </header>
 
 	<p>We're going to gather some IRC data and do some <r>COOL</r> things with it! Please visit <r>#chiglug</r> on <g>irc.oftc.net</g> and start saying <bl>shit</bl>.</p>
-	<h1>Crew</h1>
 
-    <ul id="crew">
-        <li style="display: none" id="user">
-            <h3><a href="#"></a><span class="user">Luca Matteis</span></h3>
-	    <ul></ul>
-        </li>
-    </ul>
+    <div class="content">
+    </div>
 
+    <!-- templates -->
+    <div class="crew_template" style="display: none">
+        <h1>Crew</h1>
+        <ul class="crew_card">
+            <li style="display: none" class="crew_user">
+                <h3><a href="#"></a><a href="#" class="user">Luca Matteis</a></h3>
+                <ul></ul>
+            </li>
+        </ul>
+    </div>
+    <div class="user_template" style="display: none">
+        <h1>User</h1>
+    </div>
+
+    <!--
     <h1>Latest Links</h1>
 	<links>
 	</links>
+    -->
 
         <footer>
             <bl>built using couchdb and some other weird technology</bl>
